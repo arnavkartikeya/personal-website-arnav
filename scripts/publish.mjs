@@ -56,7 +56,7 @@ try {
   fail('Build failed, nothing was committed. Fix the errors above and try again.');
 }
 
-const posts = [...new Set(changed.filter((f) => f.startsWith('src/content/blog/')).map((f) => f.split('/')[3].replace(/\.mdx?$/, '')))];
+const posts = [...new Set(changed.filter((f) => f.startsWith('src/content/blog/')).map((f) => f.split('/')[3].replace(/\.mdx?$/, '')).filter((name) => !name.startsWith('.')))];
 const message = customMessage ?? (posts.length ? `Publish: ${posts.join(', ')}` : 'Update site content');
 
 if (dryRun) {
