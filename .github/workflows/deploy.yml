@@ -23,15 +23,10 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - id: pages
-        uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v5
       - run: npm ci
+      # The domain and base path are fixed in astro.config.mjs (https://arnavk.dev, "/").
       - run: npm run build
-        env:
-          # e.g. https://arnavkartikeya.github.io and /personal-website-arnav,
-          # or your custom domain and an empty base once one is configured.
-          SITE: ${{ steps.pages.outputs.origin }}
-          BASE: ${{ steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

@@ -10,15 +10,11 @@ import rehypeKatex from 'rehype-katex';
 import rehypeCitation from 'rehype-citation';
 import rehypeFigure from './src/lib/rehype-figure.mjs';
 
-// SITE and BASE are set by the GitHub Pages workflow (.github/workflows/deploy.yml).
-// A project page lives at https://<user>.github.io/<repo>/, so BASE is "/<repo>".
-// With a custom domain or a <user>.github.io repo, BASE is just "/".
-const site = process.env.SITE || 'https://arnavkartikeya.github.io';
-const base = process.env.BASE || '/';
-
+// The site is served from the root of its custom domain. Canonical URLs, the
+// sitemap and RSS are built from `site`; asset and link paths from `base`.
 export default defineConfig({
-  site,
-  base,
+  site: 'https://arnavk.dev',
+  base: '/',
   trailingSlash: 'ignore',
   integrations: [mdx(), sitemap()],
   markdown: {

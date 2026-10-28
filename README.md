@@ -15,11 +15,7 @@ npm run preview    # serve dist/ to check the production build
 
 Astro 7 runs `dev` and `preview` as background servers. Stop them with `npx astro dev stop` / `npx astro preview stop`.
 
-To test the build exactly as GitHub Pages will serve it (under `/personal-website-arnav/`):
-
-```bash
-BASE=/personal-website-arnav npm run build && BASE=/personal-website-arnav npm run preview
-```
+The site is served from the root of https://arnavk.dev. The domain and base path are set in `astro.config.mjs`, so `npm run build && npm run preview` matches production.
 
 ## Layout
 
@@ -82,8 +78,8 @@ The script stages only `src/content/` and `public/`, so half-finished code chang
 ### One-time GitHub setup
 
 1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Push `main`. The site goes live at `https://arnavkartikeya.github.io/personal-website-arnav/`.
-3. Optional: to serve the site at the root, either rename the repo to `arnavkartikeya.github.io` or add a custom domain in Settings → Pages. The workflow reads the base path from GitHub automatically, so no code change is needed.
+2. Push `main`. The site goes live at https://arnavk.dev, the custom domain set in Settings → Pages.
+3. To move to a different domain, change the custom domain in Settings → Pages and `site` in `astro.config.mjs` to match.
 
 ## Posts from the editor
 
