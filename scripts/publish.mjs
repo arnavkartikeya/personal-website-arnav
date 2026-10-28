@@ -17,7 +17,8 @@ const msgIndex = args.indexOf('-m');
 const customMessage = msgIndex >= 0 ? args[msgIndex + 1] : undefined;
 const CONTENT_PATHS = ['src/content', 'public'];
 
-const git = (...a) => execFileSync('git', a, { encoding: 'utf8' }).trim();
+// trimEnd, not trim: porcelain status lines start with a meaningful space.
+const git = (...a) => execFileSync('git', a, { encoding: 'utf8' }).trimEnd();
 const run = (cmd, a) => execFileSync(cmd, a, { stdio: 'inherit' });
 const fail = (msg) => {
   console.error(`\n✗ ${msg}`);
