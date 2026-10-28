@@ -7,7 +7,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "publish": "node scripts/publish.mjs"
+    "publish": "node scripts/publish.mjs",
+    "import-post": "node scripts/import-post.mjs"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
     "rehype-citation": "^2.3.2",
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
+    "sharp": "^0.35.5",
+    "shiki": "^4.5.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

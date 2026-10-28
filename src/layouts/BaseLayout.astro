@@ -96,7 +96,10 @@ const nav = [
       </nav>
     </header>
 
-    <main class="mx-auto w-full max-w-[682px] flex-1 px-6 pb-24">
+    <!-- Full-width content above the column, e.g. a post's cover image. -->
+    <slot name="hero" />
+
+    <main class="relative mx-auto w-full max-w-[682px] flex-1 px-6 pb-24">
       <slot />
     </main>
 

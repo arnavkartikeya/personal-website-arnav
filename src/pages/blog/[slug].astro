@@ -4,6 +4,7 @@ import { render } from 'astro:content';
 import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate, getPosts, url, type Post } from '../../lib/posts';
+import { renderLexical } from '../../lib/lexical';
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -11,19 +12,33 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: Post };
-const { Content } = await render(post);
-const { title, description, date, updated, tags, draft, cover, coverAlt } = post.data;
+const { title, description, date, updated, tags, draft, coverAlt } = post.data;
+
+// Markdown/MDX posts render through Astro; editor posts through the Lexical renderer.
+const md = post.collection === 'blog' ? await render(post) : null;
+// Editor images are filenames in public/blog/<slug>/; full URLs pass through.
+const asset = (file: string) => (/^([a-z]+:|\/)/i.test(file) ? file : url(`blog/${post.id}/${file}`));
+const html =
+  post.collection === 'editorPosts' ? await renderLexical(post.data.lexical as any, { image: asset }) : null;
+
+const mdCover = post.collection === 'blog' ? post.data.cover : undefined;
+const editorCover = post.collection === 'editorPosts' && post.data.cover ? asset(post.data.cover) : undefined;
+const ogImage = mdCover?.src ?? editorCover;
 ---
 
-<BaseLayout
-  title={title}
-  description={description}
-  type="article"
-  publishedTime={date}
-  tags={tags}
-  image={cover?.src}
->
+<BaseLayout title={title} description={description} type="article" publishedTime={date} tags={tags} image={ogImage}>
   {draft && <meta slot="head" name="robots" content="noindex" />}
+  {
+    (mdCover || editorCover) && (
+      <div slot="hero" class="post-cover" aria-hidden={coverAlt ? undefined : 'true'}>
+        {mdCover ? (
+          <Image src={mdCover} alt={coverAlt ?? ''} widths={[800, 1400, 2000]} sizes="100vw" />
+        ) : (
+          <img src={editorCover} alt={coverAlt ?? ''} />
+        )}
+      </div>
+    )
+  }
   <article>
     <header class="mb-8 border-b border-rule pb-5">
       <h1 class="mb-2 font-serif text-[36.4px] leading-[1.13] font-normal text-ink-strong">{title}</h1>
@@ -36,10 +51,9 @@ const { title, description, date, updated, tags, draft, cover, coverAlt } = post
       </p>
     </header>
 
-    {cover && <Image src={cover} alt={coverAlt ?? ''} class="mb-8 w-full rounded-sm" />}
-
     <div class="post-body">
-      <Content />
+      {md && <md.Content />}
+      {html !== null && <Fragment set:html={html} />}
     </div>
   </article>
 

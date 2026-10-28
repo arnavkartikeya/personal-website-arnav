@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-export type Post = CollectionEntry<'blog'>;
+/** A blog post from either source: Markdown/MDX, or exported from the editor. */
+export type Post = CollectionEntry<'blog'> | CollectionEntry<'editorPosts'>;
 
 /**
  * The only way pages should read posts. Drafts are visible under `astro dev`
@@ -8,7 +9,13 @@ export type Post = CollectionEntry<'blog'>;
  * (pages, RSS, sitemap), since those only see what this returns.
  */
 export async function getPosts(): Promise<Post[]> {
-  const posts = await getCollection('blog', ({ data }) => import.meta.env.DEV || !data.draft);
+  const visible = ({ data }: { data: { draft: boolean } }) => import.meta.env.DEV || !data.draft;
+  const posts: Post[] = [...(await getCollection('blog', visible)), ...(await getCollection('editorPosts', visible))];
+  const ids = new Set<string>();
+  for (const post of posts) {
+    if (ids.has(post.id)) throw new Error(`Two posts share the slug "${post.id}".`);
+    ids.add(post.id);
+  }
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 

@@ -31,7 +31,8 @@ src/
   pages/blog/[slug].astro  article page
   pages/rss.xml.ts         RSS feed       (sitemap comes from @astrojs/sitemap)
   content.config.ts        blog post schema
-  content/blog/            posts: `slug.md`, `slug.mdx`, or `slug/index.md` + images
+  content/blog/            posts: `slug.md`, `slug.mdx`, `slug/index.md`, or `slug/post.json` (editor)
+  lib/lexical.ts           renders editor (Lexical JSON) posts to HTML
   content/references.bib   BibTeX for [@key] citations
   lib/posts.ts             getPosts() (handles the draft filter), url(), formatDate()
   lib/rehype-figure.mjs    ![alt](img.png "caption") → <figure> with <figcaption>
@@ -39,6 +40,7 @@ src/
   styles/article.css       article typography
 public/                    copied as-is (put resume.pdf here)
 scripts/publish.mjs        `npm run publish`
+scripts/import-post.mjs    `npm run import-post` (editor → site)
 .github/workflows/deploy.yml
 ```
 
@@ -83,12 +85,20 @@ The script stages only `src/content/` and `public/`, so half-finished code chang
 2. Push `main`. The site goes live at `https://arnavkartikeya.github.io/personal-website-arnav/`.
 3. Optional: to serve the site at the root, either rename the repo to `arnavkartikeya.github.io` or add a custom domain in Settings → Pages. The workflow reads the base path from GitHub automatically, so no code change is needed.
 
-## Hooking up the editor (planned)
+## Posts from the editor
 
-The local editor (`website_experiments`, a LessWrong/Lexical port) stores each post in IndexedDB as **Lexical JSON**, with images as blobs referenced by `localimg:<uuid>`. It does not produce Markdown. The planned path:
+Posts written in the local Lexical editor (`website_experiments`) are imported, not converted to Markdown. The editor's JSON stays the source of truth, and `src/lib/lexical.ts` renders it at build time: KaTeX for math, Shiki for code, and the editor's own markup for footnotes, figures and tables.
 
-1. **Export, inside the editor.** Its Publish button renders the post to HTML with Lexical's `$generateHtmlFromNodes`, the same node classes the read view uses (`.math-tex`, `.footnote-*`, `.detailsBlock`, `.code-block`). It swaps each `localimg:` reference for a filename and collects the image blobs.
-2. **Hand off locally.** The editor POSTs `{ slug, title, description, date, tags, html, images[] }` to a small local endpoint (a Vite dev-server middleware in the editor project, or a tiny Node server here). The endpoint writes `src/content/blog/<slug>/index.html` (or `.json`) and the images, then runs `scripts/publish.mjs`.
-3. **Render here.** Add a second collection (or a custom loader) for exported entries that checks the same schema, prerenders KaTeX from the `.math-tex` spans at build time, and outputs the HTML inside `.post-body`. `article.css` already has rules for the editor's class names (see the "Editor export" section), so exported posts get the same typography as Markdown posts.
+```bash
+npm run import-post -- ~/Desktop/opd_stuff/blog --slug understanding-opd \
+  [--description "…"] [--tags "rl, distillation"] [--date 2026-10-28] [--draft | --no-draft]
+```
 
-Steps 1 and 2 touch the editor project, so they're left for when we design the adapter together.
+The source is a post record (`post.json` with `title`, `subtitle`, `state` and `coverImage`) with its images in `images/<id>.<ext>`, the layout of the editor's working copy. The script writes:
+
+- `src/content/blog/<slug>/post.json`: the metadata plus the Lexical state
+- `public/blog/<slug>/*.webp`: images, resized and compressed
+
+The subtitle becomes the description. Re-running for the same slug updates the post and keeps the date, tags, description and draft flag you set before, unless you pass new ones. It also sets `updated` to today. If a post uses a node type the renderer doesn't know, the build fails and names the type; add a case to `src/lib/lexical.ts`.
+
+Then `npm run dev` to review, and `npm run publish`.

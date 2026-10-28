@@ -231,3 +231,59 @@
 .post-body .footnote-content > :last-child { margin-bottom: 0; }
 .post-body .text-underline { text-decoration: underline; }
 .post-body .text-strikethrough { text-decoration: line-through; }
+
+/* ---- Post cover: full-bleed, dissolving into the paper (as in the editor) ---- */
+
+.post-cover {
+  width: 100%;
+  height: clamp(220px, 36vw, 500px);
+  /* Pull the article up so the title sits over the faded lower edge. */
+  margin-bottom: clamp(-150px, -9vw, -70px);
+  pointer-events: none;
+  user-select: none;
+}
+.post-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 38% 45%;
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 0%, #000 42%, transparent 96%),
+    linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, #000 0%, #000 42%, transparent 96%),
+    linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-composite: intersect;
+}
+@media (max-width: 640px) {
+  .post-cover { height: 200px; margin-bottom: -56px; }
+  .post-cover img { object-position: 34% 50%; }
+}
+
+/* ---- Editor posts ---- */
+
+.post-body .image-row { display: flex; gap: 8px; margin: 1.25em 0; }
+.post-body .image-row img { flex: 1 1 0; min-width: 0; object-fit: contain; }
+@media (max-width: 640px) { .post-body .image-row { flex-direction: column; } }
+.post-body .nested-list-item { list-style: none; }
+.post-body mark { background: rgb(255 212 0 / 0.5); color: inherit; }
+.post-body td > p,
+.post-body th > p { margin: 0.5em 0; }
+.post-body td > p:first-child,
+.post-body th > p:first-child { margin-top: 0; }
+.post-body td > p:last-child,
+.post-body th > p:last-child { margin-bottom: 0; }
+
+/* Dark mode: covers are usually light, so dim them and fade the top edge too,
+   which keeps the title readable over the image. */
+.dark .post-cover img {
+  opacity: 0.42;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 42%, transparent 96%),
+    linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+  mask-image:
+    linear-gradient(to bottom, transparent 0%, #000 18%, #000 42%, transparent 96%),
+    linear-gradient(to right, transparent 0%, #000 9%, #000 91%, transparent 100%);
+}
