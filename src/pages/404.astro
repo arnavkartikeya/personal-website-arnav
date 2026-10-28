@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { url } from '../lib/posts';
+---
+
+<BaseLayout title="Not found">
+  <h1 class="mb-4 font-serif text-[36.4px] font-normal text-ink-strong">Not found</h1>
+  <p class="text-muted">
+    That page doesn't exist. Try the <a href={url('')} class="text-link">homepage</a> or the
+    <a href={url('blog')} class="text-link">blog</a>.
+  </p>
+</BaseLayout>

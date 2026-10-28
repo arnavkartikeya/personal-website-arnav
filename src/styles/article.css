@@ -1,0 +1,233 @@
+/*
+ * Article body. Matches the type scale of the local editor's read view
+ * (LessWrong's post styles: 18.2px/26px serif body, 36.4/26/20.8 headings)
+ * so a post reads the same here as it does locally.
+ *
+ * Two sources of HTML get styled:
+ *  - Markdown/MDX rendered by Astro (GFM footnotes, Shiki, KaTeX, citations)
+ *  - HTML exported from the Lexical editor, which uses its own class names
+ *    (.math-tex, .footnote-*, .detailsBlock, .code-block). Those rules are
+ *    marked "editor export" below; keep them when the adapter lands.
+ */
+
+.post-body {
+  font-family: var(--font-serif);
+  font-size: 18.2px;
+  line-height: 26px;
+  color: var(--ink);
+  overflow-wrap: break-word;
+  hanging-punctuation: first;
+}
+
+.post-body > :first-child { margin-top: 0; }
+
+.post-body p { margin: 0 0 1em; }
+
+.post-body h1,
+.post-body h2,
+.post-body h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--ink-strong);
+  margin: 1.4em 0 0.5em;
+  scroll-margin-top: 1.5rem;
+}
+.post-body h1 { font-size: 36.4px; line-height: 1.13; margin-left: -0.02em; }
+.post-body h2 { font-size: 26px; line-height: 1.2; }
+.post-body h3 { font-size: 20.8px; line-height: 1.2; color: var(--ink-heading-3); }
+.post-body h4 { font-size: 1em; font-weight: 600; margin: 1.2em 0 0.5em; }
+
+.post-body a { color: var(--link); text-decoration: none; }
+.post-body a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.post-body strong { font-weight: 600; }
+
+.post-body blockquote {
+  margin: 1em 0;
+  padding: 0.25em 0 0.25em 16px;
+  border-left: 3px solid var(--rule);
+  color: var(--ink);
+}
+.post-body blockquote > :last-child { margin-bottom: 0; }
+
+.post-body ul,
+.post-body ol { margin: 0 0 1em; padding-left: 1.5em; }
+.post-body ul { list-style: disc; }
+.post-body ol { list-style: decimal; }
+.post-body li { margin-bottom: 6.5px; }
+.post-body li > ul,
+.post-body li > ol { margin: 6.5px 0 0; }
+.post-body ol > li > ol { list-style: lower-alpha; }
+.post-body li::marker { color: var(--muted); }
+
+/* Horizontal rules render as LessWrong's "•••" */
+.post-body hr {
+  border: none;
+  margin: 32px 0;
+  text-align: center;
+  height: auto;
+}
+.post-body hr::after {
+  content: '•••';
+  color: var(--faint);
+  font-size: 13px;
+  letter-spacing: 12px;
+  margin-left: 12px;
+}
+
+/* ---- Code ---- */
+
+.post-body :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  background: var(--fill-2);
+  border-radius: 2px;
+  padding: 2px 0.3em;
+}
+
+.post-body pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  background: var(--fill-2) !important;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin: 1.25em 0;
+  overflow-x: auto;
+  tab-size: 2;
+}
+.post-body pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Shiki dual themes (defaultColor: false emits --shiki-light / --shiki-dark) */
+.post-body .astro-code span { color: var(--shiki-light); }
+.dark .post-body .astro-code span { color: var(--shiki-dark); }
+
+/* ---- Tables ---- */
+
+.post-body .table-wrap,
+.post-body .table-scrollable-wrapper { overflow-x: auto; margin: 1.25em 0; }
+.post-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.25em 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+.post-body th,
+.post-body td {
+  border: 1px solid var(--rule-strong);
+  padding: 0.4em 0.6em;
+  vertical-align: top;
+}
+.post-body th { background: var(--fill-1); font-weight: 600; }
+.post-body th:not([align]):not([style*='text-align']) { text-align: left; }
+
+/* ---- Figures & images ---- */
+
+.post-body img { max-width: 100%; height: auto; margin: 0 auto; }
+.post-body figure { margin: 1.75em 0; text-align: center; }
+.post-body figure img { display: block; }
+.post-body figcaption {
+  margin-top: 0.6em;
+  font-size: 0.85em;
+  line-height: 1.4;
+  color: var(--muted);
+  text-align: center;
+}
+.dark .post-body figure.invert-dark img { filter: invert(0.9) hue-rotate(180deg); }
+
+/* ---- Math (KaTeX) ---- */
+
+.post-body .katex { font-size: 1.05em; }
+.post-body .katex-display {
+  margin: 1.25em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25em 0;
+}
+
+/* ---- Footnotes (GFM) ---- */
+
+.post-body sup { line-height: 0; }
+.post-body [data-footnote-ref] { font-size: 0.75em; padding: 0 1px; }
+.post-body [data-footnote-ref]::before { content: '['; }
+.post-body [data-footnote-ref]::after { content: ']'; }
+.post-body section.footnotes {
+  margin-top: 2.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+/* remark-rehype renders a visually-hidden "Footnotes" heading. Tailwind doesn't
+   scan post content, so its sr-only utility isn't guaranteed to exist. */
+.post-body .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.post-body section.footnotes ol { padding-left: 1.25em; }
+.post-body .data-footnote-backref { margin-left: 0.25em; }
+
+/* ---- Citations (rehype-citation) ---- */
+
+.post-body #refs,
+.post-body .references {
+  margin-top: 2.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+.post-body #refs::before {
+  content: 'References';
+  display: block;
+  font-size: 20.8px;
+  color: var(--ink-heading-3);
+  margin-bottom: 0.75em;
+}
+.post-body .csl-entry { margin-bottom: 0.6em; padding-left: 1.5em; text-indent: -1.5em; }
+
+/* ---- Collapsible sections ---- */
+
+.post-body details,
+.post-body .detailsBlock {
+  margin: 1em 0;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+.post-body summary,
+.post-body .detailsBlockTitle {
+  background: var(--fill-2);
+  padding: 0.5em 1em;
+  font-weight: 600;
+  cursor: pointer;
+}
+.post-body details > :not(summary),
+.post-body .detailsBlockContent { padding: 0 1em; }
+.post-body details[open] > summary { margin-bottom: 0.75em; }
+
+/* ---- Editor export (Lexical) ---- */
+
+.post-body span.math-tex { display: inline-block; }
+.post-body div.math-tex { display: block; text-align: center; margin: 1em 0; }
+.post-body .footnote-section {
+  margin-top: 2.5em;
+  padding-top: 1em;
+  border-top: 1px solid var(--rule);
+  font-size: 0.9em;
+  list-style: none;
+  padding-left: 0;
+}
+.post-body .footnote-item { display: flex; gap: 0.3em; margin-bottom: 0.5em; }
+.post-body .footnote-content > :last-child { margin-bottom: 0; }
+.post-body .text-underline { text-decoration: underline; }
+.post-body .text-strikethrough { text-decoration: line-through; }
