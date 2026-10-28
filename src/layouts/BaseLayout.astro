@@ -50,13 +50,14 @@ const nav = [
     {tags.map((tag) => <meta property="article:tag" content={tag} />)}
     <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
 
-    <meta name="color-scheme" content="light dark" />
+    <meta name="color-scheme" content="light" />
     <script is:inline>
-      // Runs before paint so there's no flash of the wrong theme.
+      // Runs before paint so there's no flash of the wrong theme. Light unless
+      // the visitor picked dark with the toggle.
       (() => {
         let stored = null;
         try { stored = localStorage.getItem('theme'); } catch {}
-        const dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+        const dark = stored === 'dark';
         document.documentElement.classList.toggle('dark', dark);
       })();
     </script>
