@@ -1,0 +1,11 @@
+[
+  {
+    "id": "suki-intent-classification",
+    "title": "Scaling Suki's Command Understanding: Building Fast and Accurate Intent Classification for Clinical Voice Assistants",
+    "url": "https://www.suki.ai/blog/scaling-sukis-command-understanding-building-fast-and-accurate-intent-classification-for-clinical-voice-assistants/",
+    "date": "2025-12-18",
+    "publisher": "Suki",
+    "description": "Something I wrote over on Suki's blog: how we built fast, data-efficient intent classification for doctors' voice commands, mixing embedding retrieval with a fine-tuned model for slot filling.",
+    "tags": ["nlp", "applied ml"]
+  }
+]

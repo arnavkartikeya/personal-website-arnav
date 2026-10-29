@@ -1,12 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostList from '../../components/PostList.astro';
-import { getPosts } from '../../lib/posts';
+import { getWriting } from '../../lib/posts';
 
-const posts = await getPosts();
+const items = await getWriting();
 ---
 
 <BaseLayout title="Blog" description="Notes on post-training, reinforcement learning, and interpretability.">
   <h1 class="mb-10 font-serif text-[36.4px] leading-tight font-normal text-ink-strong">Blog</h1>
-  {posts.length > 0 ? <PostList posts={posts} /> : <p class="text-muted">Nothing here yet.</p>}
+  {items.length > 0 ? <PostList items={items} /> : <p class="text-muted">Nothing here yet.</p>}
 </BaseLayout>

@@ -19,6 +19,26 @@ export async function getPosts(): Promise<Post[]> {
   return posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 }
 
+/** One row in a writing list: a post on this site, or something published elsewhere. */
+export interface WritingItem {
+  title: string;
+  href: string;
+  date: Date;
+  description: string;
+  tags: string[];
+  draft: boolean;
+  /** Set for external pieces: where it was published. */
+  publisher?: string;
+}
+
+/** Posts plus external pieces, newest first. For listings; article pages and RSS use getPosts(). */
+export async function getWriting(): Promise<WritingItem[]> {
+  const visible = ({ data }: { data: { draft: boolean } }) => import.meta.env.DEV || !data.draft;
+  const posts = (await getPosts()).map((post) => ({ ...post.data, href: url(`blog/${post.id}`) }));
+  const external = (await getCollection('external', visible)).map(({ data }) => ({ ...data, href: data.url }));
+  return [...posts, ...external].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+}
+
 /** Prefix a site-relative path with the configured base (needed on GitHub project pages). */
 export function url(path = ''): string {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');

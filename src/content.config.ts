@@ -1,5 +1,5 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { file, glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 const meta = {
@@ -45,8 +45,27 @@ const editorPosts = defineCollection({
     /** Image filename in public/blog/<slug>/ */
     cover: z.string().optional(),
     coverAlt: z.string().optional(),
-    lexical: z.object({ root: z.object({ type: z.literal('root') }).passthrough() }),
+    lexical: z.object({ root: z.looseObject({ type: z.literal('root') }) }),
   }),
 });
 
-export const collections = { blog, editorPosts };
+/**
+ * Things written elsewhere (e.g. a company blog). Listed alongside posts, but
+ * they link out instead of getting a page here. One entry per item in
+ * src/content/external.json.
+ */
+const external = defineCollection({
+  loader: file('src/content/external.json'),
+  schema: z.object({
+    title: z.string().trim(),
+    url: z.url(),
+    date: z.coerce.date(),
+    /** Where it was published, shown next to the title, e.g. "Suki". */
+    publisher: z.string(),
+    description: z.string().trim(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { blog, editorPosts, external };

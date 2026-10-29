@@ -1,42 +1,52 @@
 ---
-import { formatDate, url, type Post } from '../lib/posts';
+import { formatDate, type WritingItem } from '../lib/posts';
 
 interface Props {
-  posts: Post[];
+  items: WritingItem[];
   /** Show description and tags (blog index) or just title + date (homepage). */
   compact?: boolean;
 }
 
-const { posts, compact = false } = Astro.props;
+const { items, compact = false } = Astro.props;
 ---
 
 <ul class="list-none p-0">
   {
-    posts.map((post) => (
+    items.map((item) => (
       <li class:list={[compact ? 'mb-2.5' : 'mb-8']}>
         <div class="flex items-baseline gap-4">
           <time
-            datetime={post.data.date.toISOString()}
+            datetime={item.date.toISOString()}
             class="w-[6.5rem] shrink-0 font-sans text-[13px] text-faint tabular-nums max-sm:hidden"
           >
-            {formatDate(post.data.date)}
+            {formatDate(item.date)}
           </time>
           <div class="min-w-0">
-            <a href={url(`blog/${post.id}`)} class="text-[19px] leading-snug text-ink-strong no-underline hover:text-link">
-              {post.data.title}
+            <a
+              href={item.href}
+              target={item.publisher ? '_blank' : undefined}
+              rel={item.publisher ? 'noopener noreferrer' : undefined}
+              class="text-[19px] leading-snug text-ink-strong no-underline hover:text-link"
+            >
+              {item.title}
             </a>
-            {post.data.draft && (
+            {item.publisher && (
+              <span class="ml-2 font-sans text-[12.5px] whitespace-nowrap text-faint" title={`Published on ${item.publisher}`}>
+                ↗ {item.publisher}
+              </span>
+            )}
+            {item.draft && (
               <span class="ml-2 rounded-sm bg-fill px-1.5 py-0.5 align-middle font-sans text-[11px] uppercase tracking-wide text-muted">
                 draft
               </span>
             )}
-            <time datetime={post.data.date.toISOString()} class="block font-sans text-[13px] text-faint sm:hidden">
-              {formatDate(post.data.date)}
+            <time datetime={item.date.toISOString()} class="block font-sans text-[13px] text-faint sm:hidden">
+              {formatDate(item.date)}
             </time>
-            {!compact && <p class="mt-1 text-[16px] leading-[1.45] text-muted">{post.data.description}</p>}
-            {!compact && post.data.tags.length > 0 && (
+            {!compact && <p class="mt-1 text-[16px] leading-[1.45] text-muted">{item.description}</p>}
+            {!compact && item.tags.length > 0 && (
               <p class="mt-1.5 font-sans text-[12.5px] text-faint">
-                {post.data.tags.map((tag, i) => (
+                {item.tags.map((tag, i) => (
                   <>
                     {i > 0 && <span aria-hidden="true"> · </span>}
                     <span>{tag}</span>
